@@ -40,7 +40,6 @@ public class Twitter implements Subject {
 		this.tid = tid;
 		this.content = msg;
 		this.obs = new ArrayList<Observer>();
-		this.tid = new Date().hashCode();
 	}
 	
 }

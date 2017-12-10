@@ -18,7 +18,7 @@ public class DB_service {
 	
 	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
 	static final String dbuser = "root";
-	static final String dbpwd = "123456";
+	static final String dbpwd = "root";
 	
 	public boolean NewTwitter(int tmpid, String string, Date date) {
 		// TODO Auto-generated method stub
@@ -38,7 +38,6 @@ public class DB_service {
 			Statement.setTime(4, new java.sql.Time(date.getTime()));
 
 			Statement.executeUpdate();
-			
 			PreparedStatement Statement1=connect.prepareStatement("INSERT INTO ClickCount VALUES (?,?)");
 			Statement1.setInt(1, tmpid);
 			Statement1.setInt(2, 0);
@@ -46,6 +45,7 @@ public class DB_service {
 			Statement1.executeUpdate();
 			
 		}catch(Exception e){
+			System.out.println(e);
 			return false;
 		}
 
@@ -92,7 +92,7 @@ public class DB_service {
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
 			Statement stmt = connect.createStatement();
 			stmt.executeUpdate("delete from Twitter where TwitterID = '"+tmpid+"' ");
-
+			System.out.println("hahaha");
 			return true;
 		}catch (Exception e){
 			System.out.println(e);
@@ -112,8 +112,9 @@ public class DB_service {
 		try{
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
 			Statement stmt = connect.createStatement();
+			System.out.println("[update Twitter set Content='"+newContent+"' where TwitterID = '"+tmpid+"' ]");
 			stmt.executeUpdate("update Twitter set Content='"+newContent+"' where TwitterID = '"+tmpid+"' ");
-
+			
 			return true;
 
 		}catch (Exception e){
@@ -166,6 +167,7 @@ public class DB_service {
 			
 			
 		}catch(Exception e){
+			System.out.println(e);
 			return ;
 		}
 
@@ -200,6 +202,7 @@ public class DB_service {
 				System.out.println(rs.getString("Content"));
 			}
 		}catch(Exception e){
+			System.out.println(e);
 			return null;
 		}
 		return ls;

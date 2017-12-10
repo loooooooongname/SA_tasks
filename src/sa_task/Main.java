@@ -35,6 +35,7 @@ public class Main {
 		DB_service db = new DB_service();
 		twitters = db.GetTwitters();
 		
+		System.out.println(twitters.size());
 		
 		while(true) {
 			show(twitters);
@@ -55,12 +56,13 @@ public class Main {
 				Twitter t = new Twitter(msg);
 				Counter tc = new Counter(t.tid);
 				Log tl = new Log(t.tid);
+				System.out.println(t.tid);
 				t.attach(tc);
 				t.attach(tl);
 				twitters.add(t);
 				twitters.get(twitters.size()-1).notify("2");
 				Date date = new Date();
-				db.NewTwitter(date.hashCode(), msg, date);
+				db.NewTwitter(t.tid, msg, date);
 			}
 			// modify
 			else if (cmd == 3) {
@@ -70,7 +72,7 @@ public class Main {
 				int tmp = cin.nextInt();
 				twitters.get(tmp).content = cin.next();
 				twitters.get(tmp).notify("3");
-				db.Modify(tmp, twitters.get(tmp).content);
+				db.Modify(twitters.get(tmp).tid, twitters.get(tmp).content);
 			}
 			// del
 			else if (cmd == 4) {
@@ -79,8 +81,8 @@ public class Main {
 				}
 				int tmp = cin.nextInt();
 				twitters.get(tmp).notify("4");
+				db.Del(twitters.get(tmp).tid);
 				twitters.remove(tmp);
-				db.Del(tmp);
 			}
 			// exit
 			else if (cmd == 5) {
