@@ -34,7 +34,6 @@ public class Main {
 		List<Twitter> twitters = new ArrayList<Twitter>();
 		DB_service db = new DB_service();
 		twitters = db.GetTwitters();
-		
 		System.out.println(twitters.size());
 		
 		while(true) {

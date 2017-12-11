@@ -16,9 +16,9 @@ import sa_task.Twitter;
 
 public class DB_service {
 	
-	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
-	static final String dbuser = "root";
-	static final String dbpwd = "root";
+	static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
+	static final String dbuser = "test";
+	static final String dbpwd = "test";
 	
 	public boolean NewTwitter(int tmpid, String string, Date date) {
 		// TODO Auto-generated method stub
@@ -31,7 +31,7 @@ public class DB_service {
 
 		try{
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
-			PreparedStatement Statement=connect.prepareStatement("INSERT INTO Twitter VALUES (?,?,?,?)");
+			PreparedStatement Statement=connect.prepareStatement("INSERT INTO Twitter (TwitterID, Content, Date, Time) VALUES (?,?,?,?)");
 			Statement.setInt(1, tmpid);
 			Statement.setString(2, string);
 			Statement.setDate(3, new java.sql.Date(date.getTime()));
@@ -92,7 +92,7 @@ public class DB_service {
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
 			Statement stmt = connect.createStatement();
 			stmt.executeUpdate("delete from Twitter where TwitterID = '"+tmpid+"' ");
-			System.out.println("hahaha");
+			// System.out.println("hahaha");
 			return true;
 		}catch (Exception e){
 			System.out.println(e);
@@ -112,7 +112,7 @@ public class DB_service {
 		try{
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
 			Statement stmt = connect.createStatement();
-			System.out.println("[update Twitter set Content='"+newContent+"' where TwitterID = '"+tmpid+"' ]");
+			// System.out.println("[update Twitter set Content='"+newContent+"' where TwitterID = '"+tmpid+"' ]");
 			stmt.executeUpdate("update Twitter set Content='"+newContent+"' where TwitterID = '"+tmpid+"' ");
 			
 			return true;
@@ -145,7 +145,7 @@ public class DB_service {
 	}
 
 	public void AddLog(int id, int op) {
-		System.out.println(id+" "+op);
+		// System.out.println(id+" "+op);
 		// TODO Auto-generated method stub
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
@@ -207,4 +207,44 @@ public class DB_service {
 		}
 		return ls;
 	}
+	public boolean Clear() {
+		// TODO Auto-generated method stub
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+		}
+		catch (Exception e){
+			System.out.println(e);
+			return false;
+		}
+		try{
+			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
+			Statement stmt = connect.createStatement();
+			stmt.executeUpdate("delete from Twitter");
+			stmt.executeUpdate("delete from Log");
+			stmt.executeUpdate("delete from ClickCount");
+			return true;
+		}catch (Exception e){
+			System.out.println(e);
+			return false;
+		}
+	}
+	public void setCounter(int id, int cnt) {
+		// TODO Auto-generated method stub
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+		}
+		catch (Exception e){
+			System.out.println(e);
+			return ;
+		}
+		try{
+			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
+			Statement stmt = connect.createStatement();
+			stmt.executeUpdate("update ClickCount set Click=" + cnt + " where TwitterID = '"+id+"' ");
+		}catch (Exception e){
+			System.out.println(e);
+			return ;
+		}
+	}
+
 }
