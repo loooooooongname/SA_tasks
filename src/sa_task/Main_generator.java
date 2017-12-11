@@ -9,9 +9,9 @@ public class Main_generator {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		DB_service db = new DB_service();
+		//DB_service db = new DB_service();
 		System.out.println(new Date());
-		db.gendata2(3, 500000);
+		//db.gendata2(3, 500000);
 		System.out.println(new Date());
 	}
 }
