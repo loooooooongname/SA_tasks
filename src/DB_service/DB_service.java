@@ -33,7 +33,95 @@ public class DB_service {
 			return;
 		}
 	}
+	
+	public Twitter getTwitterByID(int id) {
+		try {
+			Statement stmt = connect.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from Twitter where TwitterID = '" + id + "'");
+			if (rs.next()) {
+				Twitter tt = new Twitter(rs.getInt("TwitterID"), rs.getString("Content"), rs.getDate("Date"), rs.getTime("Time"));
+				Counter tc = getCounterByID(id);
+				tt.attach(tc);
+				tt.attach(new Log(id));
+				return tt;
+			}
+			else
+				return null;
+		} catch (Exception e) {
+			System.out.println(e);
+			return null;
+		}
+	}
+	
+	public Counter getCounterByID(int id) {
+		try {
+			Statement stmt = connect.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from ClickCount where TwitterID = '" + id + "'");
+			if (rs.next()) {
+				Counter ret = new Counter(rs.getInt("TwitterID"), rs.getInt("Click"));
+				return ret;
+			}
+			else
+				return null;
+		} catch (Exception e) {
+			System.out.println(e);
+			return null;
+		}
+	}
+	
+	
+	public boolean saveTwitterToDB(Twitter twitter) {
+		try {
+			delTwitter(twitter);
+			PreparedStatement Statement = connect
+					.prepareStatement("INSERT INTO Twitter (TwitterID, Content, Date, Time) VALUES (?,?,?,?)");
+			Statement.setInt(1, twitter.tid);
+			Statement.setString(2, twitter.content);
+			Statement.setDate(3, twitter.date);
+			Statement.setTime(4, twitter.time);
+			Statement.executeUpdate();
+			PreparedStatement Statement1 = connect.prepareStatement("INSERT INTO ClickCount VALUES (?,?)");
+			Statement1.setInt(1, ((Counter)twitter.obs.get(0)).count);
+			Statement1.setInt(2, 0);
 
+			Statement1.executeUpdate();
+
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean delTwitter(Twitter twitter) {
+		Statement stmt;
+		try {
+			stmt = connect.createStatement();
+			stmt.execute("delete from Twitter where TwitterID = '" + twitter.tid + "'");
+			delCount(twitter);
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean delCount(Twitter twitter) {
+		Statement stmt;
+		try {
+			stmt = connect.createStatement();
+			stmt.execute("delete from ClickCount where TwitterID = '" + twitter.tid + "'");
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	
 	public boolean NewTwitter(int tmpid, String string, Date date) {
 		try {
 			PreparedStatement Statement = connect

@@ -82,21 +82,21 @@ public class Main {
 				System.out.println(t.tid);
 				t.attach(tc);
 				t.attach(tl);
-				if (!mj.newTwitter(t)) {
-					System.out.println("Add in Cache failed");
-				}
 				Date date = new Date();
 				db.NewTwitter(t.tid, msg, date);
+				t.notify("2");
 			}
 			// modify
 			else if (cmd == 3) {
 				System.out.println(" ‰»ÎŒ¢≤©ID£∫");
 				int tmp = cin.nextInt();
 				String tmpstr = cin.next();
+				
 				if (!mj.modify(tmp,tmpstr)) {
 					System.out.println("fdsaf");
 					System.out.println("Modify in Cache failed");
 				}
+				
 				db.Modify(tmp,tmpstr);
 			}
 			// del
