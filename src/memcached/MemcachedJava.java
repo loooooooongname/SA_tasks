@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import DB_service.DB_service;
 import net.spy.memcached.MemcachedClient;
 import sa_task.Counter;
 import sa_task.Log;
@@ -16,12 +17,12 @@ import sa_task.Twitter;
 
 public class MemcachedJava {
 
-//	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
-//	static final String dbuser = "root";
-//	static final String dbpwd = "root";
-	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
-	 static final String dbuser = "test";
-	 static final String dbpwd = "test";
+	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
+	static final String dbuser = "root";
+	static final String dbpwd = "123456";
+//	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
+//	 static final String dbuser = "test";
+//	 static final String dbpwd = "test";
 	public boolean add100() {
 		// TODO Auto-generated method stub
 		try{
@@ -34,7 +35,7 @@ public class MemcachedJava {
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
 			Statement stmt = connect.createStatement();
 			Statement stmt2 = connect.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from Twitter");
+			ResultSet rs = stmt.executeQuery("select * from ClickCount order by Click desc limit 100");
 
 			if (rs.wasNull())
 				return false;
@@ -42,25 +43,15 @@ public class MemcachedJava {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
 			
 			while (rs.next()){
-				Twitter tmp = new Twitter(rs.getInt("TwitterID"), rs.getString("Content"));
-				ResultSet rs1 = stmt2.executeQuery("select * from ClickCount where TwitterID = '"+rs.getInt("TwitterID")+"' order by Click desc limit 100");
-				int tn = 0;
-				while (rs1.next()) {
-					tn = rs1.getInt("Click");
-				}
-				Counter tc = new Counter(tmp.tid, tn);
-				Log tl = new Log(tmp.tid);
-				tmp.attach(tc);
-				tmp.attach(tl);
-				
+				DB_service db = new DB_service();
+				Twitter t = db.getTwitterByID(rs.getInt("TwitterID"));
 				try {
-					mcc.set(rs.getInt("TwitterID")+"", 0, tmp);
-					System.out.println(rs.getInt("TwitterID"));
+					mcc.set(rs.getInt("TwitterID")+"", 0, t);
+//					System.out.println(rs.getInt("TwitterID"));
 				}catch(Exception e) {
 					System.out.println(e.getMessage());
 					return false;
 				}
-				
 			}
 			mcc.shutdown();
 		}catch(Exception e){
@@ -70,11 +61,13 @@ public class MemcachedJava {
 		return true;
 	}
 
-	public Twitter search(int tmp) {
+	public Twitter search(Twitter t) {
 		// TODO Auto-generated method stub
 		try {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
-			Twitter a = (Twitter)(mcc.get(tmp+""));
+			Twitter a = (Twitter)(mcc.get(t.tid+""));
+			a.notify("1");
+			mcc.set(t.tid+"", 0, a);
 			System.out.println(a.tid+" "+a.content);
 			return a ;
 		}catch(Exception e) {
@@ -87,35 +80,67 @@ public class MemcachedJava {
 		// TODO Auto-generated method stub
 		try {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
+			t.notify("2");
 			mcc.add(t.tid+"", 0, t);
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 			return false;
 		}
-		return false;
+		return true;
 	}
 
-	public boolean modify(int tmp, String tmpstr) {
+	public boolean modify(Twitter t) {
 		// TODO Auto-generated method stub
 		try {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
-			mcc.set(tmp+"", 0, tmpstr);
+			t.notify("3");
+			mcc.set(t.tid+"", 0, t);
+			return true;
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 			return false;
 		}
-		return false;
 	}
 
-	public boolean del(int tmp) {
+	public boolean del(Twitter t) {
 		// TODO Auto-generated method stub
 		try {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
-			mcc.delete(tmp+"");
+			t.notify("4");
+			mcc.delete(t.tid+"");
+			return true;
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 			return false;
 		}
-		return false;
+	}
+	
+	public Twitter InCache(Twitter t) {
+		try {
+			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
+			Twitter a = (Twitter)(mcc.get(t.tid+""));
+			if (a == null)
+				return null;
+			else
+				return a;
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+	
+	
+	public static void maina() {
+		try {
+			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
+			Twitter a = (Twitter)(mcc.get(1000+""));
+			if (a == null) {
+				System.out.println("null");
+			}else {
+				System.out.println(a);
+			}
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }

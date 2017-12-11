@@ -1,8 +1,13 @@
 package DB_service;
 
+import java.util.UUID;
+
 public class helper {
-	static int tot = 0;
 	public static int getID() {
-		return tot++;
+		int id = UUID.randomUUID().hashCode(); 
+		while (id >= 0 && id < 1500000) {
+			id = UUID.randomUUID().hashCode();
+		}
+		return id;
 	}
 }
