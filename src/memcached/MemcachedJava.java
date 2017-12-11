@@ -16,10 +16,12 @@ import sa_task.Twitter;
 
 public class MemcachedJava {
 
-	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
-	static final String dbuser = "root";
-	static final String dbpwd = "123456";
-	
+//	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
+//	static final String dbuser = "root";
+//	static final String dbpwd = "root";
+	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
+	 static final String dbuser = "test";
+	 static final String dbpwd = "test";
 	public boolean add100() {
 		// TODO Auto-generated method stub
 		try{
@@ -41,7 +43,7 @@ public class MemcachedJava {
 			
 			while (rs.next()){
 				Twitter tmp = new Twitter(rs.getInt("TwitterID"), rs.getString("Content"));
-				ResultSet rs1 = stmt2.executeQuery("select * from clickcount where TwitterID = '"+rs.getInt("TwitterID")+"' order by Click desc limit 100");
+				ResultSet rs1 = stmt2.executeQuery("select * from ClickCount where TwitterID = '"+rs.getInt("TwitterID")+"' order by Click desc limit 100");
 				int tn = 0;
 				while (rs1.next()) {
 					tn = rs1.getInt("Click");

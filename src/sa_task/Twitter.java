@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import DB_service.helper;
 public class Twitter implements Subject, Serializable {
 	
 	public List<Observer> obs;
@@ -34,7 +34,7 @@ public class Twitter implements Subject, Serializable {
 	public Twitter (String msg) {
 		this.content = msg;
 		this.obs = new ArrayList<Observer>();
-		this.tid = new Date().hashCode();
+		this.tid = helper.getID();
 	}
 	
 	public Twitter(int tid, String msg) {
