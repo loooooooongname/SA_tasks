@@ -51,7 +51,7 @@ public class Main {
 				int tmp = cin.nextInt();
 				
 				long startTime = System.currentTimeMillis();
-				Twitter tt = new Twitter(tmp, "");
+				Twitter tt = new Twitter(tmp, "0");
 				Twitter t_twitter = mj.InCache(tt);
 				
 				long endTime   = System.currentTimeMillis(); 
@@ -85,27 +85,29 @@ public class Main {
 				if (!mj.newTwitter(t)) {
 					System.out.println("Add in Cache failed");
 				}
-				Date date = new Date();
-				db.NewTwitter(t.tid, msg, date);
-			}
-			// modify
-			else if (cmd == 3) {
-				System.out.println(" ‰»ÎŒ¢≤©ID£∫");
+				db.saveTwitterToDB(t);
+			}else if (cmd == 3) {
+				
 				int tmp = cin.nextInt();
 				String tmpstr = cin.next();
 				
 				Twitter tt = new Twitter(tmp, "");
+				
 				Twitter t = mj.InCache(tt);
 				
 				if (t == null) {
 					System.out.println("In database");
 				}else{
 					t.content = tmpstr;
-					if (!mj.modify(t))
+
+					if (!mj.modify(t)) {
 						System.out.println("Modify in Cache failed");
+					}
+					
 				}
-				db.Modify(tmp,tmpstr);
+				db.saveTwitterToDB(t);
 			}
+
 			// del
 			else if (cmd == 4) {
 				System.out.println(" ‰»ÎŒ¢≤©ID£∫");
@@ -114,12 +116,12 @@ public class Main {
 				Twitter t = mj.InCache(tt);
 				
 				if (t == null) {
+					t = db.getTwitterByID(tmp);
 					System.out.println("In database");
 				}else if (!mj.del(t)) {
 					System.out.println("Delete in Cache failed");
 				}
-				db.Del(tmp);
-				//twitters.remove(tmp);
+				db.delTwitter(t);
 			}
 			// exit
 			else if (cmd == 5) {

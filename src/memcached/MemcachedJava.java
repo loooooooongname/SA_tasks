@@ -19,7 +19,7 @@ public class MemcachedJava {
 
 	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
 	static final String dbuser = "root";
-	static final String dbpwd = "root";
+	static final String dbpwd = "123456";
 //	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
 //	 static final String dbuser = "test";
 //	 static final String dbpwd = "test";
@@ -95,11 +95,11 @@ public class MemcachedJava {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
 			t.notify("3");
 			mcc.set(t.tid+"", 0, t);
+			return true;
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 			return false;
 		}
-		return false;
 	}
 
 	public boolean del(Twitter t) {
