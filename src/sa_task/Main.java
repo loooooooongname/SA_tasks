@@ -37,6 +37,7 @@ public class Main {
 			System.out.println("Cache import failed");
 			return;
 		}
+		
 		DB_service db = new DB_service();
 		
 		while(true) {
@@ -93,6 +94,7 @@ public class Main {
 				int tmp = cin.nextInt();
 				String tmpstr = cin.next();
 				if (!mj.modify(tmp,tmpstr)) {
+					System.out.println("fdsaf");
 					System.out.println("Modify in Cache failed");
 				}
 				db.Modify(tmp,tmpstr);
@@ -109,7 +111,8 @@ public class Main {
 			}
 			// exit
 			else if (cmd == 5) {
-				break;
+				System.out.println("haha");
+				System.exit(0);;
 			}
 		}
 		

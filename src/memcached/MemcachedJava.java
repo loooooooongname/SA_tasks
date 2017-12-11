@@ -16,12 +16,12 @@ import sa_task.Twitter;
 
 public class MemcachedJava {
 
-//	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
-//	static final String dbuser = "root";
-//	static final String dbpwd = "root";
-	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
-	 static final String dbuser = "test";
-	 static final String dbpwd = "test";
+	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
+	static final String dbuser = "root";
+	static final String dbpwd = "root";
+//	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
+//	 static final String dbuser = "test";
+//	 static final String dbpwd = "test";
 	public boolean add100() {
 		// TODO Auto-generated method stub
 		try{
@@ -34,7 +34,7 @@ public class MemcachedJava {
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
 			Statement stmt = connect.createStatement();
 			Statement stmt2 = connect.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from Twitter");
+			ResultSet rs = stmt.executeQuery("select * from ClickCount order by Click desc limit 100");
 
 			if (rs.wasNull())
 				return false;
@@ -42,20 +42,21 @@ public class MemcachedJava {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
 			
 			while (rs.next()){
-				Twitter tmp = new Twitter(rs.getInt("TwitterID"), rs.getString("Content"));
-				ResultSet rs1 = stmt2.executeQuery("select * from ClickCount where TwitterID = '"+rs.getInt("TwitterID")+"' order by Click desc limit 100");
-				int tn = 0;
-				while (rs1.next()) {
-					tn = rs1.getInt("Click");
+				ResultSet rs2 = stmt2.executeQuery("select * from Twitter where TwitterID = '"+rs.getInt("TwitterID")+"'");
+				String tmpcontent = "";
+				while(rs2.next()) {
+					tmpcontent = rs2.getString("Content");
+					break;
 				}
-				Counter tc = new Counter(tmp.tid, tn);
+				Twitter tmp = new Twitter(rs.getInt("TwitterID"), tmpcontent);
+				Counter tc = new Counter(tmp.tid, rs.getInt("Click"));
 				Log tl = new Log(tmp.tid);
 				tmp.attach(tc);
 				tmp.attach(tl);
 				
 				try {
 					mcc.set(rs.getInt("TwitterID")+"", 0, tmp);
-					System.out.println(rs.getInt("TwitterID"));
+//					System.out.println(rs.getInt("TwitterID"));
 				}catch(Exception e) {
 					System.out.println(e.getMessage());
 					return false;
@@ -99,7 +100,8 @@ public class MemcachedJava {
 		// TODO Auto-generated method stub
 		try {
 			MemcachedClient mcc = new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
-			mcc.set(tmp+"", 0, tmpstr);
+			Twitter tt = new Twitter(tmp, tmpstr);
+			mcc.set(tmp+"", 0, tt);
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 			return false;

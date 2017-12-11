@@ -17,12 +17,12 @@ import sa_task.Twitter;
 
 public class DB_service {
 
-	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
-	 static final String dbuser = "test";
-	 static final String dbpwd = "test";
-//	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
-//	static final String dbuser = "root";
-//	static final String dbpwd = "root";
+//	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
+//	 static final String dbuser = "test";
+//	 static final String dbpwd = "test";
+	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
+	static final String dbuser = "root";
+	static final String dbpwd = "root";
 	private Connection connect;
 
 	public DB_service() {
