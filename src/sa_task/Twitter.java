@@ -1,12 +1,11 @@
 package sa_task;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import DB_service.helper;
-
-public class Twitter implements Subject {
+public class Twitter implements Subject, Serializable {
 	
 	public List<Observer> obs;
 	public int tid;

@@ -11,19 +11,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-
 import sa_task.Counter;
 import sa_task.Log;
 import sa_task.Twitter;
 
 public class DB_service {
 
-	static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
-	static final String dbuser = "test";
-	static final String dbpwd = "test";
-	// static final String dburl = "jdbc:mysql://localhost:3306/twitter";
-	// static final String dbuser = "root";
-	// static final String dbpwd = "root";
+	 static final String dburl = "jdbc:mysql://localhost:8066/dbtest";
+	 static final String dbuser = "test";
+	 static final String dbpwd = "test";
+//	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
+//	static final String dbuser = "root";
+//	static final String dbpwd = "root";
 	private Connection connect;
 
 	public DB_service() {
@@ -137,6 +136,7 @@ public class DB_service {
 		List<Twitter> ls = new ArrayList<Twitter>();
 		try {
 			Statement stmt = connect.createStatement();
+			Statement stmt2 = connect.createStatement();
 			ResultSet rs = stmt.executeQuery("select * from Twitter");
 
 			if (rs.wasNull())
@@ -144,18 +144,47 @@ public class DB_service {
 
 			while (rs.next()) {
 				Twitter tmp = new Twitter(rs.getInt("TwitterID"), rs.getString("Content"));
-				Counter tc = new Counter(tmp.tid);
+				ResultSet rs1 = stmt2
+						.executeQuery("select * from ClickCount where TwitterID = '" + rs.getInt("TwitterID") + "' ");
+				int tn = 0;
+				while (rs1.next()) {
+					tn = rs1.getInt("Click");
+				}
+				Counter tc = new Counter(tmp.tid, tn);
 				Log tl = new Log(tmp.tid);
 				tmp.attach(tc);
 				tmp.attach(tl);
 				ls.add(tmp);
-				System.out.println(rs.getString("Content"));
 			}
 		} catch (Exception e) {
 			System.out.println(e);
 			return null;
 		}
 		return ls;
+	}
+
+	public String Search(int id) {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (Exception e) {
+			return null;
+		}
+		try {
+			Connection connect = DriverManager.getConnection(dburl, dbuser, dbpwd);
+			Statement stmt = connect.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from Twitter where TwitterID = '" + id + "'");
+
+			if (rs.wasNull())
+				return null;
+
+			while (rs.next()) {
+				return rs.getString("Content");
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			return null;
+		}
+		return null;
 	}
 
 	public boolean Clear() {
@@ -236,8 +265,7 @@ public class DB_service {
 			String sql;
 			PreparedStatement prest;
 			sql = "INSERT INTO Log(TwitterID, Operation, Date, Time) VALUES(?,?,?,?)";
-			prest = connect.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-					ResultSet.CONCUR_READ_ONLY);
+			prest = connect.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			for (int user = 0; user < maxuser; user++) {
 				for (int num = 0; num < maxnum; num++) {
 					Date date = new Date();
@@ -253,8 +281,7 @@ public class DB_service {
 			connect.commit();
 			System.out.println("add log ok");
 			sql = "INSERT INTO Twitter(TwitterID, Content, Date, Time) VALUES(?,?,?,?)";
-			prest = connect.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-					ResultSet.CONCUR_READ_ONLY);
+			prest = connect.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			for (int user = 0; user < maxuser; user++) {
 				for (int num = 0; num < maxnum; num++) {
 					String msg = String.format("user[%d]--blog[%d]", user, num);
@@ -270,8 +297,7 @@ public class DB_service {
 			connect.commit();
 			System.out.println("add twitter ok");
 			sql = "INSERT INTO ClickCount(TwitterID, Click) VALUES(?,?)";
-			prest = connect.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-					ResultSet.CONCUR_READ_ONLY);
+			prest = connect.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			for (int user = 0; user < maxuser; user++) {
 				for (int num = 0; num < maxnum; num++) {
 					prest.setInt(1, ids[user][num]);
@@ -287,6 +313,5 @@ public class DB_service {
 			System.out.println(e1);
 			e1.printStackTrace();
 		}
-
 	}
 }
