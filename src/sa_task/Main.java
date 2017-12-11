@@ -49,16 +49,26 @@ public class Main {
 				System.out.println("输入要查看的ID：");
 				int tmp = cin.nextInt();
 				
+				long startTime = System.currentTimeMillis();
+				
 				Twitter t_twitter = mj.search(tmp);
+				
+				long endTime   = System.currentTimeMillis(); 
+				long TotalTime = endTime - startTime;
+				
 				if (t_twitter != null) {
-					System.out.println("Read from cache");
+					System.out.println("Read from cache time is "+TotalTime+"ms");
 					System.out.println("id:"+tmp);
 					System.out.println("content:"+t_twitter.content);
 					db.Counter(tmp);
 				}else {
-					System.out.println("Read from database");
 					System.out.println("id:"+tmp);
+					startTime = System.currentTimeMillis();
 					System.out.println("content:"+db.Search(tmp));
+					endTime   = System.currentTimeMillis(); 
+					TotalTime = endTime - startTime;
+					
+					System.out.println("Read from database time is "+TotalTime+"ms");
 					db.Counter(tmp);
 				}
 			}
