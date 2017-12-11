@@ -1,10 +1,11 @@
 package sa_task;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import DB_service.DB_service;
 
-public class Log implements Observer {
+public class Log implements Observer, Serializable {
 	public int tid;
 	
 	

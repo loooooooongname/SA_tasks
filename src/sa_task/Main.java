@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import DB_service.DB_service;
+import memcached.MemcachedJava;
 import sa_task.Twitter;
 
 public class Main {
@@ -31,24 +32,35 @@ public class Main {
 		Scanner cin = new Scanner(System.in);
 		int cmd;
 		
-		List<Twitter> twitters = new ArrayList<Twitter>();
+		MemcachedJava mj = new MemcachedJava();
+		if (!mj.add100()) {
+			System.out.println("Cache import failed");
+			return;
+		}
 		DB_service db = new DB_service();
-		twitters = db.GetTwitters();
-		
-		System.out.println(twitters.size());
 		
 		while(true) {
-			show(twitters);
+			//show(twitters);
 			PrintMenu();
 			System.out.print("option:");
 			cmd = cin.nextInt();
 			// view
 			if (cmd == 1) {
-				for (int i = 0; i < twitters.size(); i++) {
-					System.out.println(String.format("%d:%d", i, twitters.get(i).tid));
-				}
+				System.out.println("输入要查看的ID：");
 				int tmp = cin.nextInt();
-				twitters.get(tmp).notify("1");
+				
+				Twitter t_twitter = mj.search(tmp);
+				if (t_twitter != null) {
+					System.out.println("Read from cache");
+					System.out.println("id:"+tmp);
+					System.out.println("content:"+t_twitter.content);
+					db.Counter(tmp);
+				}else {
+					System.out.println("Read from database");
+					System.out.println("id:"+tmp);
+					System.out.println("content:"+db.Search(tmp));
+					db.Counter(tmp);
+				}
 			}
 			// new
 			else if (cmd == 2) {
@@ -59,30 +71,31 @@ public class Main {
 				System.out.println(t.tid);
 				t.attach(tc);
 				t.attach(tl);
-				twitters.add(t);
-				twitters.get(twitters.size()-1).notify("2");
+				if (!mj.newTwitter(t)) {
+					System.out.println("Add in Cache failed");
+				}
 				Date date = new Date();
 				db.NewTwitter(t.tid, msg, date);
 			}
 			// modify
 			else if (cmd == 3) {
-				for (int i = 0; i < twitters.size(); i++) {
-					System.out.println(String.format("%d:%d", i, twitters.get(i).tid));
-				}
+				System.out.println("输入微博ID：");
 				int tmp = cin.nextInt();
-				twitters.get(tmp).content = cin.next();
-				twitters.get(tmp).notify("3");
-				db.Modify(twitters.get(tmp).tid, twitters.get(tmp).content);
+				String tmpstr = cin.next();
+				if (!mj.modify(tmp,tmpstr)) {
+					System.out.println("Modify in Cache failed");
+				}
+				db.Modify(tmp,tmpstr);
 			}
 			// del
 			else if (cmd == 4) {
-				for (int i = 0; i < twitters.size(); i++) {
-					System.out.println(String.format("%d:%d", i, twitters.get(i).tid));
-				}
+				System.out.println("输入微博ID：");
 				int tmp = cin.nextInt();
-				twitters.get(tmp).notify("4");
-				db.Del(twitters.get(tmp).tid);
-				twitters.remove(tmp);
+				if (!mj.del(tmp)) {
+					System.out.println("Delete in Cache failed");
+				}
+				db.Del(tmp);
+				//twitters.remove(tmp);
 			}
 			// exit
 			else if (cmd == 5) {

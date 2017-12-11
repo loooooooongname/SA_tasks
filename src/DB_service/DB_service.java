@@ -18,7 +18,7 @@ public class DB_service {
 	
 	static final String dburl = "jdbc:mysql://localhost:3306/twitter";
 	static final String dbuser = "root";
-	static final String dbpwd = "root";
+	static final String dbpwd = "123456";
 	
 	public boolean NewTwitter(int tmpid, String string, Date date) {
 		// TODO Auto-generated method stub
@@ -186,6 +186,7 @@ public class DB_service {
 		try{
 			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
 			Statement stmt = connect.createStatement();
+			Statement stmt2 = connect.createStatement();
 			ResultSet rs = stmt.executeQuery("select * from Twitter");
 
 			if (rs.wasNull())
@@ -194,17 +195,47 @@ public class DB_service {
 			
 			while (rs.next()){
 				Twitter tmp = new Twitter(rs.getInt("TwitterID"), rs.getString("Content"));
-				Counter tc = new Counter(tmp.tid);
+				ResultSet rs1 = stmt2.executeQuery("select * from clickcount where TwitterID = '"+rs.getInt("TwitterID")+"' ");
+				int tn = 0;
+				while (rs1.next()) {
+					tn = rs1.getInt("Click");
+				}
+				Counter tc = new Counter(tmp.tid, tn);
 				Log tl = new Log(tmp.tid);
 				tmp.attach(tc);
 				tmp.attach(tl);
 				ls.add(tmp);
-				System.out.println(rs.getString("Content"));
 			}
 		}catch(Exception e){
 			System.out.println(e);
 			return null;
 		}
 		return ls;
+	}
+	
+	public String Search(int id) {
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+		}
+		catch (Exception e){
+			return null;
+		}
+		try{
+			Connection connect = DriverManager.getConnection(dburl,dbuser,dbpwd);
+			Statement stmt = connect.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from Twitter where TwitterID = '"+id+"'");
+
+			if (rs.wasNull())
+				return null;
+			
+			
+			while (rs.next()){
+				return rs.getString("Content");
+			}
+		}catch(Exception e){
+			System.out.println(e);
+			return null;
+		}
+		return null;
 	}
 }

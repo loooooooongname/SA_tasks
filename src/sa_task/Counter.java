@@ -1,8 +1,10 @@
 package sa_task;
 
+import java.io.Serializable;
+
 import DB_service.DB_service;
 
-public class Counter implements Observer {
+public class Counter implements Observer, Serializable {
 	public int count;
 	public int tid;
 	
@@ -23,6 +25,11 @@ public class Counter implements Observer {
 	public Counter(int tid) {
 		this.tid = tid;
 		count = 0;
+	}
+	
+	public Counter(int tid, int cnt) {
+		this.tid = tid;
+		count = cnt;
 	}
 	
 }
