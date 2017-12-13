@@ -97,9 +97,10 @@ public class Main {
 				
 				if (t == null) {
 					System.out.println("In database");
+					t = db.getTwitterByID(tmp);
+					t.content = tmpstr;
 				}else{
 					t.content = tmpstr;
-
 					if (!mj.modify(t)) {
 						System.out.println("Modify in Cache failed");
 					}
